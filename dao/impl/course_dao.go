@@ -1,4 +1,4 @@
-package dao
+package impl
 
 import (
 	"context"
@@ -7,15 +7,13 @@ import (
 	"encoding/json"
 	"github.com/olivere/elastic/v7"
 	"log"
+	"reflect"
 	"time"
 )
 
-type CourseDao struct {
-}
+type CourseDaoImpl struct{}
 
-var CourseDaoInstance = CourseDao{}
-
-func (*CourseDao) SearchCourse(keyword string, pageNum int, pageSize int) (*entity.Page[entity.SearchCourse], error) {
+func (*CourseDaoImpl) SearchCourse(keyword string, pageNum int, pageSize int) (*entity.Page[entity.SearchCourseResult], error) {
 	query := elastic.NewBoolQuery()
 	query.Should(
 		elastic.NewMatchQuery("name", keyword),
@@ -30,7 +28,7 @@ func (*CourseDao) SearchCourse(keyword string, pageNum int, pageSize int) (*enti
 	return conveyESResultToPage(res, pageNum), nil
 }
 
-func (*CourseDao) GetCourseList(pageNum int, pageSize int) (*entity.Page[entity.SearchCourse], error) {
+func (*CourseDaoImpl) GetCourseList(pageNum int, pageSize int) (*entity.Page[entity.SearchCourseResult], error) {
 	res, err := common.ESClient.Search(common.CourseIndex).From((pageNum - 1) * pageSize).Size(pageSize).Do(context.Background())
 	if err != nil {
 		log.Panic(err)
@@ -40,7 +38,7 @@ func (*CourseDao) GetCourseList(pageNum int, pageSize int) (*entity.Page[entity.
 	return conveyESResultToPage(res, pageNum), nil
 }
 
-func (*CourseDao) InsertCourse(course *entity.Course) error {
+func (*CourseDaoImpl) InsertSearchCourse(course *entity.SearchCourse) error {
 	course.CreateTime = time.Now().UnixMilli()
 	res, err := common.ESClient.Index().Index(common.CourseIndex).BodyJson(&course).Do(context.Background())
 	if err != nil {
@@ -51,11 +49,11 @@ func (*CourseDao) InsertCourse(course *entity.Course) error {
 	return nil
 }
 
-func (*CourseDao) InsertSearchCourse(course *entity.SearchCourse) {
+func (*CourseDaoImpl) InsertCourse(course *entity.Course) {
 	common.DB.Create(course)
 }
 
-func (*CourseDao) FindCourseByTagId(tagId string, pageNum int, pageSize int) (*entity.Page[entity.Course], error) {
+func (*CourseDaoImpl) FindCourseByTagId(tagId string, pageNum int, pageSize int) (*entity.Page[entity.Course], error) {
 	var courseIdList []string
 	if err := common.DB.Table(common.TableCourseTag).Where("tag_id = ?", tagId).Pluck("course_id", &courseIdList).Error; err != nil {
 		return nil, err
@@ -83,7 +81,7 @@ func (*CourseDao) FindCourseByTagId(tagId string, pageNum int, pageSize int) (*e
 	}, nil
 }
 
-func (*CourseDao) FindCourseById(courseId string) (*entity.Course, error) {
+func (*CourseDaoImpl) FindCourseById(courseId string) (*entity.Course, error) {
 	var course entity.Course
 	if err := common.DB.Table(common.TableCourse).Find(&course, courseId).Error; err != nil {
 		return nil, err
@@ -96,28 +94,40 @@ func (*CourseDao) FindCourseById(courseId string) (*entity.Course, error) {
 	return &course, nil
 }
 
-func (*CourseDao) FindCourseStepByCourseId(courseId string) ([]*entity.CourseStep, error) {
-	var courseStepList []entity.CourseStep
-	if err := common.DB.Table(common.TableCourseStep).Where("course_id = ?", courseId).Find(&courseStepList).Error; err != nil {
+func (*CourseDaoImpl) GetRecommendationCourse() ([]*entity.SearchCourseResult, error) {
+	q := elastic.NewFunctionScoreQuery()
+	q = q.AddScoreFunc(elastic.NewRandomFunction())
+	res, err := common.ESClient.Search(common.CourseIndex).Query(q).Size(10).Do(context.Background())
+	if err != nil {
 		return nil, err
 	}
 
-	var courseStepPointerList = make([]*entity.CourseStep, len(courseStepList))
-	for i := range courseStepList {
-		courseStepPointerList[i] = &courseStepList[i]
+	var data = make([]*entity.SearchCourseResult, len(res.Hits.Hits))
+	for i, item := range res.Each(reflect.TypeOf(entity.SearchCourseResult{})) {
+		course := item.(entity.SearchCourseResult)
+		data[i] = &course
 	}
 
-	return courseStepPointerList, nil
+	return data, nil
 }
 
-func conveyESResultToPage(res *elastic.SearchResult, pageNum int) *entity.Page[entity.SearchCourse] {
-	var data = make([]*entity.SearchCourse, len(res.Hits.Hits))
+func (*CourseDaoImpl) DeleteCourse(courseId string) error {
+	return common.DB.Table(common.TableCourse).Delete("id = ?", courseId).Error
+}
+
+func (*CourseDaoImpl) DeleteSearchCourse(courseId string) error {
+	_, err := common.ESClient.Delete().Id(courseId).Do(context.Background())
+	return err
+}
+
+func conveyESResultToPage(res *elastic.SearchResult, pageNum int) *entity.Page[entity.SearchCourseResult] {
+	var data = make([]*entity.SearchCourseResult, len(res.Hits.Hits))
 	for i, hit := range res.Hits.Hits {
 		json.Unmarshal(hit.Source, &data[i])
 		data[i].Score = *hit.Score
 	}
 
-	var page = &entity.Page[entity.SearchCourse]{
+	var page = &entity.Page[entity.SearchCourseResult]{
 		PageNum: pageNum,
 		Total:   int(res.Hits.TotalHits.Value),
 		Data:    data,

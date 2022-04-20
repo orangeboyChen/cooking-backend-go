@@ -11,6 +11,8 @@ var DB *gorm.DB
 var (
 	TableUser       = "user"
 	TableCourseTag  = "course_tag"
+	TableTag        = "tag"
+	TableTagType    = "tag_type"
 	TableCourse     = "course"
 	TableCourseStep = "course_step"
 )

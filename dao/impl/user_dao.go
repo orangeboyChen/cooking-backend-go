@@ -1,4 +1,4 @@
-package dao
+package impl
 
 import (
 	"cooking-backend-go/common"
@@ -8,22 +8,20 @@ import (
 	"time"
 )
 
-type UserDao struct {
+type UserDaoImpl struct {
 }
 
-var UserDaoInstance = UserDao{}
-
-func (*UserDao) InsertUser(user *entity.User) {
+func (*UserDaoImpl) InsertUser(user *entity.User) {
 	user.Id = strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	user.CreateTime = time.Now().UnixMilli()
 	common.DB.Table(common.TableUser).Create(user)
 }
 
-func (s *UserDao) UpdateUser(user *entity.User) {
+func (s *UserDaoImpl) UpdateUser(user *entity.User) {
 	common.DB.Table(common.TableUser).Select("id", user.Id).Updates(user)
 }
 
-func (*UserDao) FindUserById(id string) (*entity.User, error) {
+func (*UserDaoImpl) FindUserById(id string) (*entity.User, error) {
 	var user entity.User
 	if err := common.DB.Table(common.TableUser).Find(&user, id).Error; err != nil {
 		return nil, err
@@ -36,7 +34,7 @@ func (*UserDao) FindUserById(id string) (*entity.User, error) {
 	return &user, nil
 }
 
-func (*UserDao) FindUserByUserIdList(idList []string) ([]*entity.User, error) {
+func (*UserDaoImpl) FindUserByUserIdList(idList []string) ([]*entity.User, error) {
 	var userList []entity.User
 	if err := common.DB.Table(common.TableUser).Select("id in (?)", idList).Pluck("avatar", &userList).Error; err != nil {
 		return nil, err
@@ -49,7 +47,7 @@ func (*UserDao) FindUserByUserIdList(idList []string) ([]*entity.User, error) {
 	return result, nil
 }
 
-func (*UserDao) FindUserByOpenid(openid string) (*entity.User, error) {
+func (*UserDaoImpl) FindUserByOpenid(openid string) (*entity.User, error) {
 	var user entity.User
 	if err := common.DB.Table(common.TableUser).Select("openid = ?", openid).Limit(1).Find(&user).Error; err != nil {
 		return nil, err

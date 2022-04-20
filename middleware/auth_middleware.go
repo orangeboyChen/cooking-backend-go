@@ -6,12 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AuthMiddleware /**
-/**
- * @Author orangeboyChen
- * @Description
- * @Date 2022/4/19 16:17
- **/
 func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		request := ctx.Request

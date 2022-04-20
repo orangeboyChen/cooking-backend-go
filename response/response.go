@@ -26,29 +26,30 @@ func (*AppException) Error() string {
 type Result struct {
 	code    int
 	message string
+	data    interface{}
 }
 
-func responseFull(ctx *gin.Context, code int, data gin.H, message string) {
+func Response(ctx *gin.Context, result Result) {
 	ctx.JSON(http.StatusOK, gin.H{
-		"code":    code,
-		"data":    data,
-		"message": message,
+		"code":    result.code,
+		"data":    result.data,
+		"message": result.message,
 	})
 }
 
-func responseMessage(ctx *gin.Context, code int, message string) {
+func ResponseData(ctx *gin.Context, result Result, data interface{}) {
 	ctx.JSON(http.StatusOK, gin.H{
-		"code":    code,
+		"code":    result.code,
+		"data":    data,
+		"message": result.message,
+	})
+}
+
+func ResponseMessage(ctx *gin.Context, result Result, message string) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    result.code,
 		"data":    nil,
 		"message": message,
-	})
-}
-
-func responseData(ctx *gin.Context, code int, data *gin.H) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"code":    code,
-		"data":    data,
-		"message": nil,
 	})
 }
 
@@ -61,21 +62,17 @@ func responseDataFull[T any](ctx *gin.Context, code int, data *T) {
 }
 
 func Success(ctx *gin.Context) {
-	responseMessage(ctx, ResultSuccess.code, ResultSuccess.message)
+	Response(ctx, ResultSuccess)
 }
 
-func SuccessJson(ctx *gin.Context, data *gin.H) {
-	responseData(ctx, ResultSuccess.code, data)
-}
-
-func SuccessData[T any](ctx *gin.Context, data *T) {
-	responseDataFull(ctx, ResultSuccess.code, data)
+func SuccessData(ctx *gin.Context, data interface{}) {
+	ResponseData(ctx, ResultSuccess, data)
 }
 
 func Error(ctx *gin.Context, result Result) {
-	responseMessage(ctx, result.code, result.message)
+	Response(ctx, result)
 }
 
 func ErrorMessage(ctx *gin.Context, result Result, message string) {
-	responseMessage(ctx, result.code, message)
+	ResponseMessage(ctx, result, message)
 }

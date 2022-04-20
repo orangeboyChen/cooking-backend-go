@@ -9,17 +9,26 @@ type Course struct {
 	CreateTime int64  `gorm:"column:create_time"`
 }
 
-type SearchCourse struct {
+type SearchCourseResult struct {
 	Id          string  `json:"id,omitempty"`
 	Name        string  `json:"name,omitempty"`
 	Detail      string  `json:"detail,omitempty"`
 	Image       string  `json:"image,omitempty"`
-	TagId       string  `json:"tagId,omitempty"`
 	UserId      string  `json:"userId,omitempty"`
 	UserAvatar  string  `json:"userAvatar,omitempty"`
 	CreateTime  int64   `json:"createTime,omitempty"`
 	Score       float64 `json:"score"`
 	NameWithHit string  `json:"nameWithHit"`
+}
+
+type SearchCourse struct {
+	Id         string `json:"id,omitempty"`
+	Name       string `json:"name,omitempty"`
+	Detail     string `json:"detail,omitempty"`
+	Image      string `json:"image,omitempty"`
+	UserId     string `json:"userId,omitempty"`
+	UserAvatar string `json:"userAvatar,omitempty"`
+	CreateTime int64  `json:"createTime,omitempty"`
 }
 
 type CourseTag struct {

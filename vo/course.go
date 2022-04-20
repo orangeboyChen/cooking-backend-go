@@ -28,7 +28,7 @@ type CourseDetailVO struct {
 	Image      string
 	UserId     string
 	UserAvatar string
-	Step       []CourseStepVO
+	Step       []*CourseStepVO
 	CreateTime int64
 }
 

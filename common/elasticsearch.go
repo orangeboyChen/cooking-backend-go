@@ -27,11 +27,10 @@ func InitElasticSearch() {
 	prepareCourseIndex()
 	prepareTagIndex()
 
-	var b = entity.SearchCourse{
+	var b = entity.SearchCourseResult{
 		Name:       "中国国家",
 		Detail:     "1",
 		Image:      "1",
-		TagId:      "1",
 		UserId:     "1",
 		UserAvatar: "1",
 		CreateTime: time.Now().UnixMilli(),

@@ -26,18 +26,25 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		r.POST("/login", controller.Login)
 
 		// /course/**
-		r.GET("/course/search", controller.CourseControllerInstance.SearchCourse)
-		r.GET("/course/query", controller.CourseControllerInstance.QueryCourse)
-		r.GET("/course/:courseId")
-		r.GET("/course/recommend")
-		r.POST("/course")
-		r.PUT("/course/:courseId")
-		r.DELETE("/course/:courseId")
+		r.Group("/course")
+		{
+			r.GET("/search", controller.CourseControllerInstance.SearchCourse)
+			r.GET("/query", controller.CourseControllerInstance.QueryCourse)
+			r.GET("/:courseId", controller.CourseControllerInstance.GetCourseDetail)
+			r.GET("/recommend", controller.CourseControllerInstance.GetRecommendCourseList)
+			r.POST("", controller.CourseControllerInstance.UploadCourse)
+			r.PUT("/:courseId", controller.CourseControllerInstance.UpdateCourse)
+			r.DELETE("/:courseId", controller.CourseControllerInstance.DeleteCourse)
+		}
 
 		// /tag/**
-		r.GET("/tag/list")
-		r.GET("/tag/type/list")
+		r.Group("/tag")
+		{
+			r.GET("/type/:tagTypeId", controller.TagControllerInstance.GetTagList)
+			r.GET("/type/list", controller.TagControllerInstance.GetTagTypeList)
+		}
 
+		//404
 		r.NoRoute(func(ctx *gin.Context) {
 			response.Error(ctx, response.ResultNotFound)
 		})

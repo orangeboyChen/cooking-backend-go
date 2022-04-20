@@ -23,7 +23,7 @@ func Login(ctx *gin.Context) {
 	}
 
 	//开始保存user信息
-	userId, err := service.UserServiceInstance.Login(loginDto)
+	userId, err := service.UserService.Login(loginDto)
 	if err != nil {
 		response.Error(ctx, response.ResultPatternError)
 		return
@@ -33,7 +33,7 @@ func Login(ctx *gin.Context) {
 	jwt, _ := jwtutils.CreateJwtToken(userId)
 
 	//返回成功
-	response.SuccessJson(ctx, &gin.H{
+	response.SuccessData(ctx, &gin.H{
 		"token": "Bearer " + jwt,
 	})
 }
