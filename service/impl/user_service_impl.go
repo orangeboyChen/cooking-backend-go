@@ -26,7 +26,7 @@ func (*UserServiceImpl) Login(dto dto.UserLoginDto) (string, error) {
 	}
 
 	claims := token.Claims.(jwt.MapClaims)
-	if claims["iss"].(string) != "https://appleid.apple.com" || claims["exp"].(int64) > time.Now().Unix() {
+	if claims["iss"].(string) != "https://appleid.apple.com" || int64(claims["exp"].(float64)) < time.Now().Unix() {
 		return "", &response.AppException{Code: response.ResultPermissionDenied}
 	}
 
@@ -37,11 +37,12 @@ func (*UserServiceImpl) Login(dto dto.UserLoginDto) (string, error) {
 	}
 
 	if user == nil {
-		dao.UserDao.InsertUser(&entity.User{
+		user = &entity.User{
 			Nickname: claims["email"].(string),
 			Openid:   openid,
 			Avatar:   "",
-		})
+		}
+		dao.UserDao.InsertUser(user)
 	} else {
 		//更改用户，但目前还没有处理逻辑
 	}

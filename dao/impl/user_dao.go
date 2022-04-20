@@ -36,7 +36,7 @@ func (*UserDaoImpl) FindUserById(id string) (*entity.User, error) {
 
 func (*UserDaoImpl) FindUserByUserIdList(idList []string) ([]*entity.User, error) {
 	var userList []entity.User
-	if err := common.DB.Select("id in (?)", idList).Pluck("avatar", &userList).Error; err != nil {
+	if err := common.DB.Where("id in (?)", idList).Pluck("avatar", &userList).Error; err != nil {
 		return nil, err
 	}
 
@@ -49,8 +49,12 @@ func (*UserDaoImpl) FindUserByUserIdList(idList []string) ([]*entity.User, error
 
 func (*UserDaoImpl) FindUserByOpenid(openid string) (*entity.User, error) {
 	var user entity.User
-	if err := common.DB.Select("openid = ?", openid).Limit(1).Find(&user).Error; err != nil {
+	if err := common.DB.Where("openid = ?", openid).Find(&user).Error; err != nil {
 		return nil, err
+	}
+
+	if user.Id == "" {
+		return nil, nil
 	}
 
 	return &user, nil

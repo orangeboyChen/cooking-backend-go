@@ -44,6 +44,7 @@ func (*UserController) Login(ctx *gin.Context) {
 
 	//返回成功
 	response.SuccessData(ctx, &gin.H{
-		"token": "Bearer " + jwt,
+		"token":  "Bearer " + jwt,
+		"userId": userId,
 	})
 }

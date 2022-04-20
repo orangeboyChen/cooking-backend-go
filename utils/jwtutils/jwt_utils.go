@@ -14,7 +14,7 @@ func CreateJwtToken(userId string) (string, error) {
 	})
 
 	var token string
-	token, err := raw.SignedString(key)
+	token, err := raw.SignedString([]byte(key))
 	if err != nil {
 		return "", err
 	}
