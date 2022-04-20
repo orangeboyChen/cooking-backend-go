@@ -25,7 +25,7 @@ func (*TagController) GetTagList(ctx *gin.Context) {
 
 	list, err := service.TagService.GetTagList(tagTypeId)
 	if err != nil {
-		response.Error(ctx, response.ResultInternalServerError)
+		response.ErrorHandler(ctx, err)
 		return
 	}
 
@@ -39,7 +39,7 @@ func (*TagController) GetTagList(ctx *gin.Context) {
 func (*TagController) GetTagTypeList(ctx *gin.Context) {
 	list, err := service.TagService.GetTagTypeList()
 	if err != nil {
-		response.Error(ctx, response.ResultInternalServerError)
+		response.ErrorHandler(ctx, err)
 		return
 	}
 

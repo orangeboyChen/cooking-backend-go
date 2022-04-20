@@ -15,7 +15,6 @@ type UserServiceImpl struct {
 
 func (*UserServiceImpl) Login(dto dto.UserLoginDto) (string, error) {
 	//1. 向苹果要签名
-
 	jwks, err := keyfunc.Get("https://appleid.apple.com/auth/keys", keyfunc.Options{})
 	if err != nil {
 		return "", err

@@ -6,7 +6,6 @@ import (
 	"cooking-backend-go/service"
 	"cooking-backend-go/utils/jwtutils"
 	"encoding/json"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 )
@@ -36,12 +35,7 @@ func (*UserController) Login(ctx *gin.Context) {
 	//开始保存user信息
 	userId, err := service.UserService.Login(loginDto)
 	if err != nil {
-		var exception *response.AppException
-		if errors.As(err, &exception) {
-			response.ErrorException(ctx, *exception)
-		} else {
-			response.Error(ctx, response.ResultPatternError)
-		}
+		response.ErrorHandler(ctx, err)
 		return
 	}
 

@@ -58,7 +58,7 @@ func (*CourseServiceImpl) GetCourseDetail(courseId string) (*vo.CourseDetailVO, 
 	}
 
 	if course == nil {
-		return nil, nil
+		return nil, &response.AppException{Code: response.ResultNotFound}
 	}
 
 	courseStepList, err := dao.CourseStepDao.FindCourseStepByCourseId(courseId)
@@ -192,6 +192,12 @@ func (*CourseServiceImpl) InsertCourse(courseDto dto.CourseDto, userId string) (
 func (*CourseServiceImpl) UpdateCourse(courseDto dto.CourseDto, courseId string, userId string) error {
 	var err error
 
+	//检测用户合法性
+	course, err := dao.CourseDao.FindCourseById(courseId)
+	if err != nil || course == nil || course.UserId != userId {
+		return &response.AppException{Code: response.ResultPermissionDenied}
+	}
+
 	//检验tag的合法性
 	tagList, err := dao.TagDao.GetTagListByIdList(courseDto.Tags)
 	if err != nil {
@@ -233,7 +239,7 @@ func (*CourseServiceImpl) UpdateCourse(courseDto dto.CourseDto, courseId string,
 	}
 
 	//组装Course
-	var course = entity.Course{
+	course = &entity.Course{
 		Id:     searchCourse.Id,
 		Name:   courseDto.Name,
 		Detail: courseDto.Detail,
@@ -242,7 +248,7 @@ func (*CourseServiceImpl) UpdateCourse(courseDto dto.CourseDto, courseId string,
 	}
 
 	//保存Course
-	dao.CourseDao.InsertCourse(&course)
+	dao.CourseDao.InsertCourse(course)
 
 	//组装CourseTag
 	var courseTagList = make([]*entity.CourseTag, len(courseDto.Tags))
@@ -281,9 +287,16 @@ func (*CourseServiceImpl) UpdateCourse(courseDto dto.CourseDto, courseId string,
 	return nil
 }
 
-func (*CourseServiceImpl) DeleteCourse(courseId string) error {
-	//级联删除
+func (*CourseServiceImpl) DeleteCourse(courseId string, userId string) error {
 	var err error
+
+	//监测用户合法性
+	course, err := dao.CourseDao.FindCourseById(courseId)
+	if err != nil || course == nil || course.UserId != userId {
+		return &response.AppException{Code: response.ResultPermissionDenied}
+	}
+
+	//级联删除
 	err = dao.CourseStepDao.DeleteByCourseId(courseId)
 	err = dao.CourseTagDao.DeleteCourseTagByCourseId(courseId)
 	err = dao.CourseDao.DeleteCourse(courseId)

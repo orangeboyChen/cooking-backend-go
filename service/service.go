@@ -19,7 +19,7 @@ type courseService interface {
 	GetCourseRecommendation() ([]*vo.SearchCourseVO, error)
 	InsertCourse(courseDto dto.CourseDto, userId string) (string, error)
 	UpdateCourse(courseDto dto.CourseDto, courseId string, userId string) error
-	DeleteCourse(courseId string) error
+	DeleteCourse(courseId string, userId string) error
 }
 
 type tagService interface {

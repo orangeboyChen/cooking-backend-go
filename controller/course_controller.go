@@ -5,10 +5,8 @@ import (
 	"cooking-backend-go/response"
 	"cooking-backend-go/service"
 	"encoding/json"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
-	"log"
 	"strconv"
 )
 
@@ -41,8 +39,7 @@ func (*CourseController) SearchCourse(ctx *gin.Context) {
 
 	page, err := service.CourseService.SearchCourse(keyword, pageNum, pageSize)
 	if err != nil {
-		response.Error(ctx, response.ResultInternalServerError)
-		log.Panic(err)
+		response.ErrorHandler(ctx, err)
 		return
 	}
 
@@ -73,7 +70,7 @@ func (*CourseController) QueryCourse(ctx *gin.Context) {
 
 	page, err := service.CourseService.GetCourseByTag(keyword, pageNum, pageSize)
 	if err != nil {
-		response.Error(ctx, response.ResultInternalServerError)
+		response.ErrorHandler(ctx, err)
 		return
 	}
 
@@ -89,7 +86,7 @@ func (*CourseController) GetCourseDetail(ctx *gin.Context) {
 	courseId := ctx.Param("courseId")
 	detail, err := service.CourseService.GetCourseDetail(courseId)
 	if err != nil {
-		response.Error(ctx, response.ResultPatternError)
+		response.ErrorHandler(ctx, err)
 		return
 	}
 
@@ -103,12 +100,8 @@ func (*CourseController) GetCourseDetail(ctx *gin.Context) {
 func (*CourseController) GetRecommendCourseList(ctx *gin.Context) {
 	courseList, err := service.CourseService.GetCourseRecommendation()
 	if err != nil {
-		var exception *response.AppException
-		if errors.As(err, &exception) {
-			response.ErrorException(ctx, *exception)
-		} else {
-			response.Error(ctx, response.ResultInternalServerError)
-		}
+		response.ErrorHandler(ctx, err)
+		return
 	}
 
 	response.SuccessData(ctx, courseList)
@@ -130,7 +123,7 @@ func (*CourseController) UploadCourse(ctx *gin.Context) {
 	var courseDto dto.CourseDto
 	err = json.Unmarshal(bodyByte, &courseDto)
 	if err != nil {
-		response.Error(ctx, response.ResultPatternError)
+		response.ErrorHandler(ctx, err)
 		return
 	}
 
@@ -146,16 +139,9 @@ func (*CourseController) UploadCourse(ctx *gin.Context) {
 // @Param    dto       body  dto.CourseDto  true  "菜品详情"
 // @Router   /course/{courseId} [PUT]
 func (*CourseController) UpdateCourse(ctx *gin.Context) {
-
-}
-
-// DeleteCourse 删除菜品
-// @Summary  删除菜品
-// @Tags     菜品
-// @Param    courseId  path  string  true  "courseId"
-// @Router   /course/{courseId} [DELETE]
-func (*CourseController) DeleteCourse(ctx *gin.Context) {
 	request := ctx.Request
+	courseId := ctx.Param("courseId")
+	userId := request.Header.Get("userId")
 	bodyByte, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		response.Error(ctx, response.ResultPatternError)
@@ -168,20 +154,26 @@ func (*CourseController) DeleteCourse(ctx *gin.Context) {
 		response.Error(ctx, response.ResultPatternError)
 		return
 	}
-
-	courseId := ctx.Param("courseId")
-	if courseId == "" {
-		response.Error(ctx, response.ResultPatternError)
-		return
-	}
-
-	userId := request.Header.Get("userId")
-
 	err = service.CourseService.UpdateCourse(courseDto, courseId, userId)
 	if err != nil {
-		response.Error(ctx, response.ResultInternalServerError)
+		response.ErrorHandler(ctx, err)
 		return
 	}
+	response.Success(ctx)
+}
 
+// DeleteCourse 删除菜品
+// @Summary  删除菜品
+// @Tags     菜品
+// @Param    courseId  path  string  true  "courseId"
+// @Router   /course/{courseId} [DELETE]
+func (*CourseController) DeleteCourse(ctx *gin.Context) {
+	courseId := ctx.Param("courseId")
+	userId := ctx.Request.Header.Get("userId")
+	err := service.CourseService.DeleteCourse(courseId, userId)
+	if err != nil {
+		response.ErrorHandler(ctx, err)
+		return
+	}
 	response.Success(ctx)
 }

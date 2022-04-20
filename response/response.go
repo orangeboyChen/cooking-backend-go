@@ -1,6 +1,7 @@
 package response
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -71,6 +72,16 @@ func SuccessData(ctx *gin.Context, data interface{}) {
 
 func Error(ctx *gin.Context, result Result) {
 	Response(ctx, result)
+}
+
+func ErrorHandler(ctx *gin.Context, err error) {
+	var exception *AppException
+	if errors.As(err, &exception) {
+		ErrorException(ctx, *exception)
+	} else {
+		Error(ctx, ResultInternalServerError)
+	}
+	return
 }
 
 func ErrorException(ctx *gin.Context, exception AppException) {
