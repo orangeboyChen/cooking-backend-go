@@ -17,8 +17,8 @@ type courseService interface {
 	GetCourseByTag(tagId string, pageNum int, pageSize int) (*vo.PageVO[vo.CourseVO], error)
 	GetCourseDetail(courseId string) (*vo.CourseDetailVO, error)
 	GetCourseRecommendation() ([]*vo.SearchCourseVO, error)
-	InsertCourse(courseDto dto.CourseDto) error
-	UpdateCourse(courseDto dto.CourseDto, courseId string) error
+	InsertCourse(courseDto dto.CourseDto, userId string) (string, error)
+	UpdateCourse(courseDto dto.CourseDto, courseId string, userId string) error
 	DeleteCourse(courseId string) error
 }
 

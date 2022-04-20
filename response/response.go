@@ -11,7 +11,7 @@ var (
 	ResultNotFound            = Result{code: 404, message: "艹"}
 	ResultInternalServerError = Result{code: 500, message: "艹你妈"}
 
-	ResultPatternError = Result{code: 23333, message: "妈的日了狗了"}
+	ResultPatternError = Result{code: 401, message: "他妈的艹你妈不好好看文档"}
 )
 
 type AppException struct {
@@ -71,6 +71,10 @@ func SuccessData(ctx *gin.Context, data interface{}) {
 
 func Error(ctx *gin.Context, result Result) {
 	Response(ctx, result)
+}
+
+func ErrorException(ctx *gin.Context, exception AppException) {
+	Response(ctx, exception.Code)
 }
 
 func ErrorMessage(ctx *gin.Context, result Result, message string) {

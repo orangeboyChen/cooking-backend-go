@@ -10,7 +10,7 @@ type CourseStepDaoImpl struct{}
 
 func (*CourseStepDaoImpl) FindCourseStepByCourseId(courseId string) ([]*entity.CourseStep, error) {
 	var courseStepList []entity.CourseStep
-	if err := common.DB.Table(common.TableCourseStep).Where("course_id = ?", courseId).Find(&courseStepList).Error; err != nil {
+	if err := common.DB.Where("course_id = ?", courseId).Find(&courseStepList).Error; err != nil {
 		return nil, err
 	}
 
@@ -24,9 +24,9 @@ func (*CourseStepDaoImpl) FindCourseStepByCourseId(courseId string) ([]*entity.C
 
 func (*CourseStepDaoImpl) InsertList(list []*entity.CourseStep) error {
 	structList := utils.ToStructList(list)
-	return common.DB.Table(common.TableCourseStep).Create(&structList).Error
+	return common.DB.Create(&structList).Error
 }
 
 func (*CourseStepDaoImpl) DeleteByCourseId(courseId string) error {
-	return common.DB.Table(common.TableCourseStep).Delete("course_id = ?", courseId).Error
+	return common.DB.Delete("course_id = ?", courseId).Error
 }

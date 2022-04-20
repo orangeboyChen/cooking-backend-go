@@ -1,9 +1,13 @@
 package controller
 
 import (
+	"cooking-backend-go/dto"
 	"cooking-backend-go/response"
 	"cooking-backend-go/service"
+	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"log"
 	"strconv"
 )
@@ -92,18 +96,92 @@ func (*CourseController) GetCourseDetail(ctx *gin.Context) {
 	response.SuccessData(ctx, detail)
 }
 
+// GetRecommendCourseList 获取推荐列表
+// @Summary  获取推荐列表
+// @Tags     菜品
+// @Router   /course/recommend [GET]
 func (*CourseController) GetRecommendCourseList(ctx *gin.Context) {
+	courseList, err := service.CourseService.GetCourseRecommendation()
+	if err != nil {
+		var exception *response.AppException
+		if errors.As(err, &exception) {
+			response.ErrorException(ctx, *exception)
+		} else {
+			response.Error(ctx, response.ResultInternalServerError)
+		}
+	}
 
+	response.SuccessData(ctx, courseList)
 }
 
+// UploadCourse 上传菜品
+// @Summary  上传菜品
+// @Tags     菜品
+// @Param    dto  body  dto.CourseDto  true  "菜品详情"
+// @Router   /course [POST]
 func (*CourseController) UploadCourse(ctx *gin.Context) {
+	request := ctx.Request
+	bodyByte, err := ioutil.ReadAll(request.Body)
+	if err != nil {
+		response.Error(ctx, response.ResultPatternError)
+		return
+	}
 
+	var courseDto dto.CourseDto
+	err = json.Unmarshal(bodyByte, &courseDto)
+	if err != nil {
+		response.Error(ctx, response.ResultPatternError)
+		return
+	}
+
+	userId := request.Header.Get("userId")
+
+	userId, err = service.CourseService.InsertCourse(courseDto, userId)
 }
 
+// UpdateCourse 更新菜品
+// @Summary  更新菜品
+// @Tags     菜品
+// @Param    courseId  path  string         true  "courseId"
+// @Param    dto       body  dto.CourseDto  true  "菜品详情"
+// @Router   /course/{courseId} [PUT]
 func (*CourseController) UpdateCourse(ctx *gin.Context) {
 
 }
 
+// DeleteCourse 删除菜品
+// @Summary  删除菜品
+// @Tags     菜品
+// @Param    courseId  path  string  true  "courseId"
+// @Router   /course/{courseId} [DELETE]
 func (*CourseController) DeleteCourse(ctx *gin.Context) {
+	request := ctx.Request
+	bodyByte, err := ioutil.ReadAll(request.Body)
+	if err != nil {
+		response.Error(ctx, response.ResultPatternError)
+		return
+	}
 
+	var courseDto dto.CourseDto
+	err = json.Unmarshal(bodyByte, &courseDto)
+	if err != nil {
+		response.Error(ctx, response.ResultPatternError)
+		return
+	}
+
+	courseId := ctx.Param("courseId")
+	if courseId == "" {
+		response.Error(ctx, response.ResultPatternError)
+		return
+	}
+
+	userId := request.Header.Get("userId")
+
+	err = service.CourseService.UpdateCourse(courseDto, courseId, userId)
+	if err != nil {
+		response.Error(ctx, response.ResultInternalServerError)
+		return
+	}
+
+	response.Success(ctx)
 }

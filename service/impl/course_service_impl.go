@@ -109,20 +109,20 @@ func (*CourseServiceImpl) GetCourseRecommendation() ([]*vo.SearchCourseVO, error
 	return courseVOList, nil
 }
 
-func (*CourseServiceImpl) InsertCourse(courseDto dto.CourseDto) error {
+func (*CourseServiceImpl) InsertCourse(courseDto dto.CourseDto, userId string) (string, error) {
 	//查找用户信息
-	user, err := dao.UserDao.FindUserById(courseDto.UserId)
+	user, err := dao.UserDao.FindUserById(userId)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	//检验tag的合法性
 	tagList, err := dao.TagDao.GetTagListByIdList(courseDto.Tags)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if len(tagList) != len(courseDto.Tags) {
-		return &response.AppException{Code: response.ResultPatternError}
+		return "", &response.AppException{Code: response.ResultPatternError}
 	}
 
 	//组装Search Course
@@ -130,14 +130,14 @@ func (*CourseServiceImpl) InsertCourse(courseDto dto.CourseDto) error {
 		Name:       courseDto.Name,
 		Detail:     courseDto.Detail,
 		Image:      courseDto.Image,
-		UserId:     courseDto.UserId,
+		UserId:     userId,
 		UserAvatar: user.Avatar,
 	}
 
 	//保存SearchCourse
 	err = dao.CourseDao.InsertSearchCourse(&searchCourse)
 	if err != nil {
-		return nil
+		return "", nil
 	}
 
 	//组装Course
@@ -146,7 +146,7 @@ func (*CourseServiceImpl) InsertCourse(courseDto dto.CourseDto) error {
 		Name:   courseDto.Name,
 		Detail: courseDto.Detail,
 		Image:  courseDto.Image,
-		UserId: courseDto.UserId,
+		UserId: userId,
 	}
 
 	//保存Course
@@ -164,7 +164,7 @@ func (*CourseServiceImpl) InsertCourse(courseDto dto.CourseDto) error {
 	//保存CourseTag
 	err = dao.CourseTagDao.InsertCourseTagList(courseTagList)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	//组装Step
@@ -183,13 +183,13 @@ func (*CourseServiceImpl) InsertCourse(courseDto dto.CourseDto) error {
 	//保存Step
 	err = dao.CourseStepDao.InsertList(stepList)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return userId, nil
 }
 
-func (*CourseServiceImpl) UpdateCourse(courseDto dto.CourseDto, courseId string) error {
+func (*CourseServiceImpl) UpdateCourse(courseDto dto.CourseDto, courseId string, userId string) error {
 	var err error
 
 	//检验tag的合法性
@@ -211,7 +211,7 @@ func (*CourseServiceImpl) UpdateCourse(courseDto dto.CourseDto, courseId string)
 	}
 
 	//开始重新添加
-	user, err := dao.UserDao.FindUserById(courseDto.UserId)
+	user, err := dao.UserDao.FindUserById(userId)
 	if err != nil {
 		return err
 	}
@@ -222,7 +222,7 @@ func (*CourseServiceImpl) UpdateCourse(courseDto dto.CourseDto, courseId string)
 		Name:       courseDto.Name,
 		Detail:     courseDto.Detail,
 		Image:      courseDto.Image,
-		UserId:     courseDto.UserId,
+		UserId:     userId,
 		UserAvatar: user.Avatar,
 	}
 
@@ -238,7 +238,7 @@ func (*CourseServiceImpl) UpdateCourse(courseDto dto.CourseDto, courseId string)
 		Name:   courseDto.Name,
 		Detail: courseDto.Detail,
 		Image:  courseDto.Image,
-		UserId: courseDto.UserId,
+		UserId: userId,
 	}
 
 	//保存Course

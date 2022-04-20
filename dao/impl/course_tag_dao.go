@@ -17,9 +17,9 @@ func (*CourseTagDaoImpl) InsertCourseTagList(list []*entity.CourseTag) error {
 		structList[i] = *item
 	}
 
-	return common.DB.Table(common.TableCourseTag).Create(&structList).Error
+	return common.DB.Create(&structList).Error
 }
 
 func (*CourseTagDaoImpl) DeleteCourseTagByCourseId(courseId string) error {
-	return common.DB.Table(common.TableCourseTag).Delete("course_id = ?", courseId).Error
+	return common.DB.Delete("course_id = ?", courseId).Error
 }

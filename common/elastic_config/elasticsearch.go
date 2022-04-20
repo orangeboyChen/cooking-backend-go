@@ -1,11 +1,9 @@
-package common
+package elastic_config
 
 import (
 	"context"
-	"cooking-backend-go/entity"
 	"github.com/olivere/elastic/v7"
 	"log"
-	"time"
 )
 
 var ESClient *elastic.Client
@@ -15,33 +13,12 @@ var TagIndex = "cooking_tag"
 func InitElasticSearch() {
 	client, err := elastic.NewClient(elastic.SetSniff(false))
 	if err != nil {
-		panic(err)
+		log.Panic("你妈的没准备好数据库就来找我？你把我当谁了？艹你妈", err)
 	}
 
 	ESClient = client
-
-	//_, err = client.DeleteIndex(CourseIndex).Do(context.Background())
-	//if err != nil {
-	//	panic(err)
-	//}
 	prepareCourseIndex()
 	prepareTagIndex()
-
-	var b = entity.SearchCourseResult{
-		Name:       "中国国家",
-		Detail:     "1",
-		Image:      "1",
-		UserId:     "1",
-		UserAvatar: "1",
-		CreateTime: time.Now().UnixMilli(),
-	}
-
-	res, err := ESClient.Index().Index(CourseIndex).BodyJson(&b).Do(context.Background())
-	if err != nil {
-		log.Panic(err)
-	}
-
-	log.Print(res)
 }
 
 func prepareCourseIndex() {
@@ -87,7 +64,7 @@ func prepareCourseIndex() {
 
 		_, err := ESClient.CreateIndex(CourseIndex).Body(mapping).Do(context.Background())
 		if err != nil {
-			log.Fatal("创建cooking_course索引失败", err.Error())
+			log.Fatal("妈的创建cooking_course索引失败了，你自己去手动创建一个", err.Error())
 		}
 	}
 }
@@ -118,7 +95,7 @@ func prepareTagIndex() {
 
 		_, err := ESClient.CreateIndex(TagIndex).Body(mapping).Do(context.Background())
 		if err != nil {
-			log.Fatal("创建cooking_tag索引失败", err.Error())
+			log.Fatal("妈的创建cooking_tag索引失败了，你他妈自己去手动创建一个", err.Error())
 		}
 	}
 }

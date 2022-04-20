@@ -1,11 +1,13 @@
 package entity
 
+import "cooking-backend-go/common"
+
 type Course struct {
-	Id         string `gorm:"column:id;primaryKey;not null"`
-	Name       string `gorm:"column:name;not null"`
+	Id         string `gorm:"column:id;primaryKey;not null;type:varchar(32)"`
+	Name       string `gorm:"column:name;not null;type:varchar(512)"`
 	Detail     string `gorm:"column:detail;not null"`
-	Image      string `gorm:"column:image"`
-	UserId     string `gorm:"column:user_id"`
+	Image      string `gorm:"column:image;type:varchar(32)"`
+	UserId     string `gorm:"column:user_id;type:varchar(32)"`
 	CreateTime int64  `gorm:"column:create_time"`
 }
 
@@ -38,9 +40,21 @@ type CourseTag struct {
 }
 
 type CourseStep struct {
-	Id       string `gorm:"primaryKey;column:id"`
-	CourseId string `gorm:"column:id"`
+	Id       string `gorm:"primaryKey;column:id;type:varchar(32)"`
+	CourseId string `gorm:"column:id;type:varchar(32)"`
 	Content  string `gorm:"column:content"`
 	Order    int    `gorm:"column:order"`
 	Second   int    `gorm:"column:second"`
+}
+
+func (*Course) TableName() string {
+	return common.TableCourse
+}
+
+func (*CourseTag) TableName() string {
+	return common.TableCourseTag
+}
+
+func (*CourseStep) TableName() string {
+	return common.TableCourseStep
 }

@@ -3,9 +3,9 @@ package vo
 import "cooking-backend-go/entity"
 
 type PageVO[T any] struct {
-	PageNum int  `json:"pageNum,omitempty"`
-	Total   int  `json:"total,omitempty"`
-	Data    []*T `json:"data,omitempty"`
+	PageNum int  `json:"pageNum"`
+	Total   int  `json:"total"`
+	Data    []*T `json:"data"`
 }
 
 type EntityToVOInterface[T any, K any] interface {

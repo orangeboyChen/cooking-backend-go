@@ -6,15 +6,26 @@ import (
 	"cooking-backend-go/service"
 	"cooking-backend-go/utils/jwtutils"
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 )
 
-func Login(ctx *gin.Context) {
+type UserController struct {
+}
+
+var UserControllerImpl = UserController{}
+
+// Login 登录
+// @Tags     用户
+// @Summary  登录
+// @Param    dto  body      dto.UserLoginDto  true  "dto"
+// @Success  200  {object}  response.Result
+// @Router   /login [POST]
+func (*UserController) Login(ctx *gin.Context) {
 	request := ctx.Request
 
-	bodyStream := request.Body
-	var bodyByte = make([]byte, 1024)
-	_, _ = bodyStream.Read(bodyByte)
+	bodyByte, err := ioutil.ReadAll(request.Body)
 
 	var loginDto dto.UserLoginDto
 	if err := json.Unmarshal(bodyByte, &loginDto); err != nil {
@@ -25,7 +36,12 @@ func Login(ctx *gin.Context) {
 	//开始保存user信息
 	userId, err := service.UserService.Login(loginDto)
 	if err != nil {
-		response.Error(ctx, response.ResultPatternError)
+		var exception *response.AppException
+		if errors.As(err, &exception) {
+			response.ErrorException(ctx, *exception)
+		} else {
+			response.Error(ctx, response.ResultPatternError)
+		}
 		return
 	}
 

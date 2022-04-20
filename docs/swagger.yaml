@@ -1,0 +1,192 @@
+definitions:
+  dto.CourseDto:
+    properties:
+      detail:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      step:
+        items:
+          $ref: '#/definitions/dto.CourseStepDto'
+        type: array
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.CourseStepDto:
+    properties:
+      content:
+        type: string
+      order:
+        type: integer
+      second:
+        type: integer
+    type: object
+  dto.UserLoginDto:
+    properties:
+      identityToken:
+        type: string
+    type: object
+  response.Result:
+    type: object
+info:
+  contact:
+    name: orangeboyChen
+  description: 如有问题，请联系orangeboy
+  title: 不叫外卖后端API文档
+  version: "1.0"
+paths:
+  /course:
+    post:
+      parameters:
+      - description: 菜品详情
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CourseDto'
+      responses: {}
+      summary: 上传菜品
+      tags:
+      - 菜品
+  /course/{courseId}:
+    delete:
+      parameters:
+      - description: courseId
+        in: path
+        name: courseId
+        required: true
+        type: string
+      responses: {}
+      summary: 删除菜品
+      tags:
+      - 菜品
+    get:
+      parameters:
+      - description: 菜品id
+        in: path
+        name: courseId
+        required: true
+        type: string
+      responses: {}
+      summary: 获取菜品详情
+      tags:
+      - 菜品
+    put:
+      parameters:
+      - description: courseId
+        in: path
+        name: courseId
+        required: true
+        type: string
+      - description: 菜品详情
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CourseDto'
+      responses: {}
+      summary: 更新菜品
+      tags:
+      - 菜品
+  /course/query:
+    get:
+      parameters:
+      - description: '查找类型，可选: tag'
+        in: query
+        name: by
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      - description: 页数
+        in: query
+        name: pageNum
+        required: true
+        type: integer
+      - description: 页面大小
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      responses: {}
+      summary: 查找菜品
+      tags:
+      - 菜品
+  /course/recommend:
+    get:
+      responses: {}
+      summary: 获取推荐列表
+      tags:
+      - 菜品
+  /course/search:
+    get:
+      description: 根据关键字搜索菜品
+      parameters:
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      - description: 页数
+        in: query
+        name: pageNum
+        required: true
+        type: integer
+      - description: 页面大小
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Result'
+      summary: 搜索菜品
+      tags:
+      - 菜品
+  /login:
+    post:
+      parameters:
+      - description: dto
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserLoginDto'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Result'
+      summary: 登录
+      tags:
+      - 用户
+  /tag/type/{tagTypeId}:
+    get:
+      parameters:
+      - description: tagTypeId
+        in: path
+        name: typeId
+        required: true
+        type: string
+      responses: {}
+      summary: 获取标签列表
+      tags:
+      - 标签
+  /tag/type/list:
+    get:
+      responses: {}
+      summary: 获取标签种类列表
+      tags:
+      - 标签
+swagger: "2.0"

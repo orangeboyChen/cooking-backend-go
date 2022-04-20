@@ -1,0 +1,6 @@
+go:
+  datasource:
+    username: cooking
+    password: kcO2Jr1TGe3tyq5b
+    url: nowcent-database.mysql.rds.aliyuncs.com
+    database: cooking
