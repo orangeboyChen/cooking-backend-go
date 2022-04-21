@@ -19,12 +19,12 @@ func (*UserDaoImpl) InsertUser(user *entity.User) error {
 }
 
 func (s *UserDaoImpl) UpdateUser(user *entity.User) error {
-	return common.DB.Select("id", user.Id).Updates(user).Error
+	return common.DB.Where("id", user.Id).Updates(user).Error
 }
 
 func (*UserDaoImpl) FindUserById(id string) (*entity.User, error) {
 	var user entity.User
-	if err := common.DB.Find(&user, id).Error; err != nil {
+	if err := common.DB.Where("id = ?", id).Find(&user).Error; err != nil {
 		return nil, err
 	}
 

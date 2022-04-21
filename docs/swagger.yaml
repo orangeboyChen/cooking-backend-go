@@ -225,6 +225,14 @@ paths:
       summary: 获取标签种类列表
       tags:
       - 标签
+  /user:
+    get:
+      responses: {}
+      security:
+      - ApiAuthToken: []
+      summary: 获取用户信息
+      tags:
+      - 用户
   /user/avatar:
     put:
       parameters:

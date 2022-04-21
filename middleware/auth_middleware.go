@@ -4,6 +4,8 @@ import (
 	"cooking-backend-go/response"
 	"cooking-backend-go/utils/jwtutils"
 	"github.com/gin-gonic/gin"
+	"strings"
+	"time"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
@@ -17,6 +19,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		token := request.Header.Get("Authorization")
+		token = strings.ReplaceAll(token, "Bearer ", "")
 
 		if token == "" {
 			response.Error(ctx, response.ResultPermissionDenied)
@@ -31,7 +34,12 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		if int64(claims["timestamp"].(float64)) > time.Now().UnixMilli()+1000*60*60*24 {
+			response.Error(ctx, response.ResultTokenExpired)
+			ctx.Abort()
+			return
+		}
+
 		request.Header.Set("userId", claims["userId"].(string))
-		ctx.Next()
 	}
 }

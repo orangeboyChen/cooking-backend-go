@@ -45,6 +45,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 				userRoute.PUT("/info", controller.UserControllerInstance.UpdateUserInfo)
 				userRoute.GET("/avatar/:avatarFileName", controller.UserControllerInstance.GetAvatar)
 				userRoute.PUT("/avatar", controller.UserControllerInstance.UploadAvatar)
+				userRoute.GET("", controller.UserControllerInstance.GetUserInfo)
 			}
 
 			// /course/**

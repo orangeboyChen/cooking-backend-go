@@ -32,4 +32,5 @@ type userService interface {
 	SetAvatar(userId string, avatarFilePath string) error
 	GetAvatar(userId string) (string, error)
 	UpdateUserInfo(userInfoDto dto.UserInfoDto, userId string) error
+	FindUserById(userId string) (*vo.UserInfoVO, error)
 }
