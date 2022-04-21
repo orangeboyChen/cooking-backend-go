@@ -4,7 +4,7 @@ type CourseDto struct {
 	Name   string
 	Detail string
 	Image  string
-	Tags   []string
+	Tags   []string `example:"id1,id2"`
 	Step   []CourseStepDto
 }
 

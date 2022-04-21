@@ -12,6 +12,9 @@ definitions:
           $ref: '#/definitions/dto.CourseStepDto'
         type: array
       tags:
+        example:
+        - id1
+        - id2
         items:
           type: string
         type: array
@@ -25,12 +28,29 @@ definitions:
       second:
         type: integer
     type: object
+  dto.UserInfoDto:
+    properties:
+      birthday:
+        type: integer
+      gender:
+        type: integer
+      nickName:
+        example: 傻逼
+        type: string
+    type: object
   dto.UserLoginDto:
     properties:
       identityToken:
+        example: 你他妈向苹果登录那个token
         type: string
     type: object
   response.Result:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
     type: object
 info:
   contact:
@@ -44,11 +64,13 @@ paths:
       parameters:
       - description: 菜品详情
         in: body
-        name: dto
+        name: body
         required: true
         schema:
           $ref: '#/definitions/dto.CourseDto'
       responses: {}
+      security:
+      - ApiAuthToken: []
       summary: 上传菜品
       tags:
       - 菜品
@@ -61,6 +83,8 @@ paths:
         required: true
         type: string
       responses: {}
+      security:
+      - ApiAuthToken: []
       summary: 删除菜品
       tags:
       - 菜品
@@ -72,6 +96,8 @@ paths:
         required: true
         type: string
       responses: {}
+      security:
+      - ApiAuthToken: []
       summary: 获取菜品详情
       tags:
       - 菜品
@@ -84,11 +110,13 @@ paths:
         type: string
       - description: 菜品详情
         in: body
-        name: dto
+        name: body
         required: true
         schema:
           $ref: '#/definitions/dto.CourseDto'
       responses: {}
+      security:
+      - ApiAuthToken: []
       summary: 更新菜品
       tags:
       - 菜品
@@ -116,12 +144,16 @@ paths:
         required: true
         type: integer
       responses: {}
+      security:
+      - ApiAuthToken: []
       summary: 查找菜品
       tags:
       - 菜品
   /course/recommend:
     get:
       responses: {}
+      security:
+      - ApiAuthToken: []
       summary: 获取推荐列表
       tags:
       - 菜品
@@ -144,22 +176,22 @@ paths:
         name: pageSize
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/response.Result'
+      security:
+      - ApiAuthToken: []
       summary: 搜索菜品
       tags:
       - 菜品
   /login:
     post:
       parameters:
-      - description: dto
+      - description: 登录数据
         in: body
-        name: dto
+        name: body
         required: true
         schema:
           $ref: '#/definitions/dto.UserLoginDto'
@@ -170,7 +202,7 @@ paths:
             $ref: '#/definitions/response.Result'
       summary: 登录
       tags:
-      - 用户
+      - 鉴权
   /tag/type/{tagTypeId}:
     get:
       parameters:
@@ -180,13 +212,65 @@ paths:
         required: true
         type: string
       responses: {}
+      security:
+      - ApiAuthToken: []
       summary: 获取标签列表
       tags:
       - 标签
   /tag/type/list:
     get:
       responses: {}
+      security:
+      - ApiAuthToken: []
       summary: 获取标签种类列表
       tags:
       - 标签
+  /user/avatar:
+    put:
+      parameters:
+      - description: 头像
+        in: formData
+        name: avatar
+        required: true
+        type: file
+      responses: {}
+      security:
+      - ApiAuthToken: []
+      summary: 上传头像
+      tags:
+      - 用户
+  /user/avatar/{avatarFileName}:
+    get:
+      parameters:
+      - description: avatarFileName
+        in: path
+        name: avatarFileName
+        required: true
+        type: string
+      responses: {}
+      security:
+      - ApiAuthToken: []
+      summary: 获取用户头像
+      tags:
+      - 用户
+  /user/info:
+    put:
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserInfoDto'
+      responses: {}
+      security:
+      - ApiAuthToken: []
+      summary: 更新用户信息
+      tags:
+      - 用户
+securityDefinitions:
+  ApiAuthToken:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

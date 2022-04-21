@@ -29,4 +29,7 @@ type tagService interface {
 
 type userService interface {
 	Login(dto dto.UserLoginDto) (string, error)
+	SetAvatar(userId string, avatarFilePath string) error
+	GetAvatar(userId string) (string, error)
+	UpdateUserInfo(userInfoDto dto.UserInfoDto, userId string) error
 }

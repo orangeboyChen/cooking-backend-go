@@ -11,10 +11,13 @@ import (
 	"os"
 )
 
-// @title         不叫外卖后端API文档
-// @version       1.0
-// @description   如有问题，请联系orangeboy
-// @contact.name  orangeboyChen
+// @title                       不叫外卖后端API文档
+// @version                     1.0
+// @description                 如有问题，请联系orangeboy
+// @contact.name                orangeboyChen
+// @securityDefinitions.apikey  ApiAuthToken
+// @in                          header
+// @name                        Authorization
 func main() {
 	initConfig()
 	initDatabase()

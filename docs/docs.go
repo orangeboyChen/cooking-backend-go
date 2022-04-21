@@ -20,6 +20,11 @@ const docTemplate = `{
     "paths": {
         "/course": {
             "post": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
                 "tags": [
                     "菜品"
                 ],
@@ -27,7 +32,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "菜品详情",
-                        "name": "dto",
+                        "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -40,6 +45,11 @@ const docTemplate = `{
         },
         "/course/query": {
             "get": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
                 "tags": [
                     "菜品"
                 ],
@@ -79,6 +89,11 @@ const docTemplate = `{
         },
         "/course/recommend": {
             "get": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
                 "tags": [
                     "菜品"
                 ],
@@ -88,10 +103,12 @@ const docTemplate = `{
         },
         "/course/search": {
             "get": {
-                "description": "根据关键字搜索菜品",
-                "produces": [
-                    "application/json"
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
                 ],
+                "description": "根据关键字搜索菜品",
                 "tags": [
                     "菜品"
                 ],
@@ -131,6 +148,11 @@ const docTemplate = `{
         },
         "/course/{courseId}": {
             "get": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
                 "tags": [
                     "菜品"
                 ],
@@ -147,6 +169,11 @@ const docTemplate = `{
                 "responses": {}
             },
             "put": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
                 "tags": [
                     "菜品"
                 ],
@@ -161,7 +188,7 @@ const docTemplate = `{
                     },
                     {
                         "description": "菜品详情",
-                        "name": "dto",
+                        "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -172,6 +199,11 @@ const docTemplate = `{
                 "responses": {}
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
                 "tags": [
                     "菜品"
                 ],
@@ -191,13 +223,13 @@ const docTemplate = `{
         "/login": {
             "post": {
                 "tags": [
-                    "用户"
+                    "鉴权"
                 ],
                 "summary": "登录",
                 "parameters": [
                     {
-                        "description": "dto",
-                        "name": "dto",
+                        "description": "登录数据",
+                        "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -217,6 +249,11 @@ const docTemplate = `{
         },
         "/tag/type/list": {
             "get": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
                 "tags": [
                     "标签"
                 ],
@@ -226,6 +263,11 @@ const docTemplate = `{
         },
         "/tag/type/{tagTypeId}": {
             "get": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
                 "tags": [
                     "标签"
                 ],
@@ -237,6 +279,77 @@ const docTemplate = `{
                         "name": "typeId",
                         "in": "path",
                         "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/avatar": {
+            "put": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "上传头像",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "头像",
+                        "name": "avatar",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/avatar/{avatarFileName}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "获取用户头像",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "avatarFileName",
+                        "name": "avatarFileName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/info": {
+            "put": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "更新用户信息",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserInfoDto"
+                        }
                     }
                 ],
                 "responses": {}
@@ -266,7 +379,11 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "example": [
+                        "id1",
+                        "id2"
+                    ]
                 }
             }
         },
@@ -284,16 +401,48 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UserInfoDto": {
+            "type": "object",
+            "properties": {
+                "birthday": {
+                    "type": "integer"
+                },
+                "gender": {
+                    "type": "integer"
+                },
+                "nickName": {
+                    "type": "string",
+                    "example": "傻逼"
+                }
+            }
+        },
         "dto.UserLoginDto": {
             "type": "object",
             "properties": {
                 "identityToken": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "你他妈向苹果登录那个token"
                 }
             }
         },
         "response.Result": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiAuthToken": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

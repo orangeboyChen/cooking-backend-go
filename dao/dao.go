@@ -38,8 +38,8 @@ type tagDao interface {
 }
 
 type userDao interface {
-	InsertUser(user *entity.User)
-	UpdateUser(user *entity.User)
+	InsertUser(user *entity.User) error
+	UpdateUser(user *entity.User) error
 	FindUserById(id string) (*entity.User, error)
 	FindUserByUserIdList(idList []string) ([]*entity.User, error)
 	FindUserByOpenid(openid string) (*entity.User, error)

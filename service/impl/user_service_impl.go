@@ -13,6 +13,51 @@ import (
 type UserServiceImpl struct {
 }
 
+func (*UserServiceImpl) UpdateUserInfo(userInfoDto dto.UserInfoDto, userId string) error {
+	user, err := dao.UserDao.FindUserById(userId)
+	if err != nil {
+		return err
+	}
+
+	if user == nil {
+		return &response.AppException{Code: response.ResultNoSuchUser}
+	}
+
+	user.Nickname = userInfoDto.NickName
+	user.Birthday = userInfoDto.Birthday
+	user.Gender = userInfoDto.Gender
+
+	return dao.UserDao.UpdateUser(user)
+}
+
+func (*UserServiceImpl) GetAvatar(userId string) (string, error) {
+	user, err := dao.UserDao.FindUserById(userId)
+	if err != nil {
+		return "", err
+	}
+
+	if user == nil {
+		return "", &response.AppException{Code: response.ResultNoSuchUser}
+	}
+
+	return user.Avatar, nil
+}
+
+func (*UserServiceImpl) SetAvatar(userId string, avatarFilePath string) error {
+	user, err := dao.UserDao.FindUserById(userId)
+	if err != nil {
+		return err
+	}
+
+	if user == nil {
+		return &response.AppException{Code: response.ResultNoSuchUser}
+	}
+
+	user.Avatar = avatarFilePath
+	dao.UserDao.UpdateUser(user)
+	return nil
+}
+
 func (*UserServiceImpl) Login(dto dto.UserLoginDto) (string, error) {
 	//1. 向苹果要签名
 	jwks, err := keyfunc.Get("https://appleid.apple.com/auth/keys", keyfunc.Options{})
@@ -22,12 +67,12 @@ func (*UserServiceImpl) Login(dto dto.UserLoginDto) (string, error) {
 
 	token, err := jwt.Parse(dto.IdentityToken, jwks.Keyfunc)
 	if err != nil {
-		return "", &response.AppException{Code: response.ResultPermissionDenied}
+		return "", &response.AppException{Code: response.ResultLoginError}
 	}
 
 	claims := token.Claims.(jwt.MapClaims)
 	if claims["iss"].(string) != "https://appleid.apple.com" || int64(claims["exp"].(float64)) < time.Now().Unix() {
-		return "", &response.AppException{Code: response.ResultPermissionDenied}
+		return "", &response.AppException{Code: response.ResultLoginError}
 	}
 
 	openid := claims["sub"].(string)

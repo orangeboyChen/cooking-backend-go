@@ -4,6 +4,7 @@ import (
 	"cooking-backend-go/common"
 	"cooking-backend-go/entity"
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 	"strings"
 	"time"
 )
@@ -11,14 +12,14 @@ import (
 type UserDaoImpl struct {
 }
 
-func (*UserDaoImpl) InsertUser(user *entity.User) {
+func (*UserDaoImpl) InsertUser(user *entity.User) error {
 	user.Id = strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	user.CreateTime = time.Now().UnixMilli()
-	common.DB.Create(user)
+	return common.DB.Create(user).Error
 }
 
-func (s *UserDaoImpl) UpdateUser(user *entity.User) {
-	common.DB.Select("id", user.Id).Updates(user)
+func (s *UserDaoImpl) UpdateUser(user *entity.User) error {
+	return common.DB.Select("id", user.Id).Updates(user).Error
 }
 
 func (*UserDaoImpl) FindUserById(id string) (*entity.User, error) {
@@ -49,12 +50,12 @@ func (*UserDaoImpl) FindUserByUserIdList(idList []string) ([]*entity.User, error
 
 func (*UserDaoImpl) FindUserByOpenid(openid string) (*entity.User, error) {
 	var user entity.User
-	if err := common.DB.Where("openid = ?", openid).Find(&user).Error; err != nil {
-		return nil, err
-	}
-
-	if user.Id == "" {
-		return nil, nil
+	if err := common.DB.Where("openid = ?", openid).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		} else {
+			return nil, err
+		}
 	}
 
 	return &user, nil
