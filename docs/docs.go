@@ -284,6 +284,20 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/user": {
+            "get": {
+                "security": [
+                    {
+                        "ApiAuthToken": []
+                    }
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "获取用户信息",
+                "responses": {}
+            }
+        },
         "/user/avatar": {
             "put": {
                 "security": [

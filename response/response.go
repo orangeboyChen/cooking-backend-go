@@ -17,6 +17,8 @@ var (
 	ResultNoSuchUser   = Result{Code: 40000, Message: "没有这个人艹你妈"}
 	ResultNoSuchFile   = Result{Code: 404, Message: "艹你妈逼文件没找到"}
 	ResultLoginError   = Result{Code: 40001, Message: "他妈逼的你传的东西有问题艹"}
+	ResultTokenExpired = Result{Code: 40002, Message: "token过期了，自己去重新登录吧他妈的"}
+	ResultNoSuchCourse = Result{Code: 40003, Message: "他妈的艹你妈逼没有这个菜还问我"}
 )
 
 type AppException struct {
@@ -73,7 +75,7 @@ func ErrorHandler(ctx *gin.Context, err error) {
 	if errors.As(err, &exception) {
 		ErrorException(ctx, *exception)
 	} else {
-		Error(ctx, ResultInternalServerError)
+		//Error(ctx, ResultInternalServerError)
 		log.Panicln(err)
 	}
 	return

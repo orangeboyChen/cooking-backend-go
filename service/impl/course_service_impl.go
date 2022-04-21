@@ -58,7 +58,7 @@ func (*CourseServiceImpl) GetCourseDetail(courseId string) (*vo.CourseDetailVO, 
 	}
 
 	if course == nil {
-		return nil, &response.AppException{Code: response.ResultNotFound}
+		return nil, &response.AppException{Code: response.ResultNoSuchCourse}
 	}
 
 	courseStepList, err := dao.CourseStepDao.FindCourseStepByCourseId(courseId)
@@ -207,6 +207,16 @@ func (*CourseServiceImpl) UpdateCourse(courseDto dto.CourseDto, courseId string,
 		return &response.AppException{Code: response.ResultPatternError}
 	}
 
+	//检验菜品合法性
+	course, err = dao.CourseDao.FindCourseById(courseId)
+	if err != nil {
+		return err
+	}
+
+	if course == nil {
+		return &response.AppException{Code: response.ResultNoSuchCourse}
+	}
+
 	//这里采用先删除再新增
 	//集联删除
 	err = dao.CourseStepDao.DeleteByCourseId(courseId)
@@ -290,8 +300,18 @@ func (*CourseServiceImpl) UpdateCourse(courseDto dto.CourseDto, courseId string,
 func (*CourseServiceImpl) DeleteCourse(courseId string, userId string) error {
 	var err error
 
-	//监测用户合法性
+	//检验菜品合法性
 	course, err := dao.CourseDao.FindCourseById(courseId)
+	if err != nil {
+		return err
+	}
+
+	if course == nil {
+		return &response.AppException{Code: response.ResultNoSuchCourse}
+	}
+
+	//监测用户合法性
+	course, err = dao.CourseDao.FindCourseById(courseId)
 	if err != nil || course == nil || course.UserId != userId {
 		return &response.AppException{Code: response.ResultPermissionDenied}
 	}

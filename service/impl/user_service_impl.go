@@ -5,12 +5,30 @@ import (
 	"cooking-backend-go/dto"
 	"cooking-backend-go/entity"
 	"cooking-backend-go/response"
+	"cooking-backend-go/vo"
 	"github.com/MicahParks/keyfunc"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
 )
 
 type UserServiceImpl struct {
+}
+
+func (*UserServiceImpl) FindUserById(userId string) (*vo.UserInfoVO, error) {
+	user, err := dao.UserDao.FindUserById(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, nil
+	}
+
+	return &vo.UserInfoVO{
+		Nickname: user.Nickname,
+		Avatar:   user.Avatar,
+		Birthday: user.Birthday,
+	}, nil
 }
 
 func (*UserServiceImpl) UpdateUserInfo(userInfoDto dto.UserInfoDto, userId string) error {
@@ -81,9 +99,14 @@ func (*UserServiceImpl) Login(dto dto.UserLoginDto) (string, error) {
 		return "", err
 	}
 
+	nickname, ok := claims["email"].(string)
+	if !ok {
+		nickname = openid
+	}
+
 	if user == nil {
 		user = &entity.User{
-			Nickname: claims["email"].(string),
+			Nickname: nickname,
 			Openid:   openid,
 			Avatar:   "",
 		}

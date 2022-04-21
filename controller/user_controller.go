@@ -73,7 +73,7 @@ func (*UserController) UpdateUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	userId := ctx.Param("userId")
+	userId := request.Header.Get("userId")
 	err = service.UserService.UpdateUserInfo(userInfoDto, userId)
 	if err != nil {
 		response.ErrorHandler(ctx, err)
@@ -159,4 +159,27 @@ func (*UserController) UploadAvatar(ctx *gin.Context) {
 		return
 	}
 	response.Success(ctx)
+}
+
+// GetUserInfo 获取用户信息
+// @Tags      用户
+// @Summary   获取用户信息
+// @Security  ApiAuthToken
+// @Router    /user [GET]
+func (*UserController) GetUserInfo(ctx *gin.Context) {
+	request := ctx.Request
+	userId := request.Header.Get("userId")
+
+	userVO, err := service.UserService.FindUserById(userId)
+	if err != nil {
+		response.ErrorHandler(ctx, err)
+		return
+	}
+
+	if userVO == nil {
+		response.Error(ctx, response.ResultNoSuchUser)
+		return
+	}
+
+	response.SuccessData(ctx, userVO)
 }

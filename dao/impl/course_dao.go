@@ -56,12 +56,12 @@ func (*CourseDaoImpl) InsertCourse(course *entity.Course) {
 
 func (*CourseDaoImpl) FindCourseByTagId(tagId string, pageNum int, pageSize int) (*entity.Page[entity.Course], error) {
 	var courseIdList []string
-	if err := common.DB.Where("tag_id = ?", tagId).Pluck("course_id", &courseIdList).Error; err != nil {
+	if err := common.DB.Model(&entity.CourseTag{}).Where("tag_id = ?", tagId).Pluck("course_id", &courseIdList).Error; err != nil {
 		return nil, err
 	}
 
 	var count int64
-	if err := common.DB.Where("id in (?)").Count(&count).Error; err != nil {
+	if err := common.DB.Model(&entity.Course{}).Where("id in (?)", courseIdList).Count(&count).Error; err != nil {
 		return nil, err
 	}
 
