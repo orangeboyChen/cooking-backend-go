@@ -90,7 +90,7 @@ func (*UserController) UpdateUserInfo(ctx *gin.Context) {
 // @Param     avatarFileName  path  string  true  "avatarFileName"
 // @Router    /user/avatar/{avatarFileName} [GET]
 func (*UserController) GetAvatar(ctx *gin.Context) {
-	avatarFileName := ctx.Param("avatarFileName")
+	avatarFileName := ctx.Param("avatarFileName") + ".jpg"
 
 	open, err := os.Open("./data/avatar/" + avatarFileName)
 	defer open.Close()
