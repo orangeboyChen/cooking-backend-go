@@ -9,12 +9,16 @@ import (
 
 var DB *gorm.DB
 var (
-	TableUser       = "user"
-	TableCourseTag  = "course_tag"
-	TableTag        = "tag"
-	TableTagType    = "tag_type"
-	TableCourse     = "course"
-	TableCourseStep = "course_step"
+	TableUser             = "user"
+	TableCourseTag        = "course_tag"
+	TableTag              = "tag"
+	TableTagType          = "tag_type"
+	TableCourse           = "course"
+	TableCourseStep       = "course_step"
+	TableIngredient       = "ingredient"
+	TableIngredientCourse = "ingredient_course"
+	TableMeal             = "meal"
+	TableMealCourse       = "meal_course"
 )
 
 func InitDatabase(username string, password string, url string, database string) {

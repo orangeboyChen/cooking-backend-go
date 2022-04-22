@@ -25,9 +25,6 @@ func main() {
 	r := gin.Default()
 	r = route.CollectRoute(r)
 
-	//courseDao := dao.CourseDao{}
-	//courseDao.SearchCourse("中国", 1, 1)
-	//courseDao.GetCourseList(1, 100)
 	panic(r.Run())
 }
 
@@ -49,7 +46,17 @@ func initDatabase() {
 
 	func() {
 		//开始建表
-		err := common.DB.AutoMigrate(&entity.User{}, &entity.Course{}, &entity.CourseTag{}, &entity.CourseStep{}, &entity.Tag{}, &entity.TagType{})
+		err := common.DB.AutoMigrate(
+			&entity.User{},
+			&entity.Course{},
+			&entity.CourseTag{},
+			&entity.CourseStep{},
+			&entity.Tag{},
+			&entity.TagType{},
+			&entity.Meal{},
+			&entity.MealCourse{},
+			&entity.Ingredient{},
+			&entity.IngredientCourse{})
 		if err != nil {
 			log.Fatal("妈的数据库建表失败了，你他妈去写建表语句去自己去建表吧艹", err)
 		}
