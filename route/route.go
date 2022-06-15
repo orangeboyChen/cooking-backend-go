@@ -36,7 +36,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 		// /login
 		apiGroup.POST("/login", controller.UserControllerInstance.Login)
 
-		authGroup := apiGroup.Group("", middleware.AuthMiddleware())
+		authGroup := apiGroup.Group("")
 		{
 
 			// /user
@@ -49,7 +49,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 			}
 
 			// /course/**
-			courseRoute := authGroup.Group("/course", middleware.AuthMiddleware())
+			courseRoute := authGroup.Group("/course")
 			{
 				courseRoute.GET("/search", controller.CourseControllerInstance.SearchCourse)
 				courseRoute.GET("/query", controller.CourseControllerInstance.QueryCourse)
@@ -65,6 +65,12 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 			{
 				tagRoute.GET("/type/list", controller.TagControllerInstance.GetTagTypeList)
 				tagRoute.GET("/type/:tagTypeId", controller.TagControllerInstance.GetTagList)
+			}
+
+			// /meal/**
+			mealRoute := authGroup.Group("/meal", middleware.AuthMiddleware())
+			{
+				mealRoute.GET("/:mealId")
 			}
 		}
 

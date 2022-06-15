@@ -2,14 +2,16 @@ package service
 
 import (
 	"cooking-backend-go/dto"
+	"cooking-backend-go/entity"
 	"cooking-backend-go/service/impl"
 	"cooking-backend-go/vo"
 )
 
 var (
-	CourseService courseService = &impl.CourseServiceImpl{}
-	TagService    tagService    = &impl.TagServiceImpl{}
-	UserService   userService   = &impl.UserServiceImpl{}
+	CourseService     courseService     = &impl.CourseServiceImpl{}
+	TagService        tagService        = &impl.TagServiceImpl{}
+	UserService       userService       = &impl.UserServiceImpl{}
+	IngredientService ingredientService = &impl.IngredientServiceImpl{}
 )
 
 type courseService interface {
@@ -33,4 +35,12 @@ type userService interface {
 	GetAvatar(userId string) (string, error)
 	UpdateUserInfo(userInfoDto dto.UserInfoDto, userId string) error
 	FindUserById(userId string) (*vo.UserInfoVO, error)
+}
+
+type ingredientService interface {
+	GetIngredientByCourseId(courseId string) ([]*entity.Ingredient, error)
+	ConveyModelToVo(model *entity.Ingredient) *vo.IngredientVO
+}
+
+type mealService interface {
 }

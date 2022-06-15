@@ -10,14 +10,71 @@ import (
 
 type CourseServiceImpl struct{}
 
+// SearchCourse 根据关键词模糊搜索课程
 func (*CourseServiceImpl) SearchCourse(keyword string, pageNum int, pageSize int) (*vo.PageVO[vo.SearchCourseVO], error) {
+	//1. 获取原始对象列表
 	page, err := dao.CourseDao.SearchCourse(keyword, pageNum, pageSize)
 	if err != nil {
 		return nil, err
 	}
 
+	//2. 组装视图列表
+	var idList = make([]string, len(page.Data))
+	for i, e := range page.Data {
+		idList[i] = e.Id
+	}
+
+	//2.1 先找到符合条件的交叉表对象
+	ingredientCourseList, err := dao.IngredientCourseDao.FindIngredientCourseByCourseIdList(idList)
+	if err != nil {
+		return nil, err
+	}
+
+	//2.2 组装数据
+	var courseIdIngredientIdMap = make(map[string][]string)
+	for _, ingredientCourse := range ingredientCourseList {
+		list := courseIdIngredientIdMap[ingredientCourse.IngredientId]
+		courseId := ingredientCourse.CourseId
+		if list == nil {
+			list = make([]string, 10)
+			list[0] = courseId
+		} else {
+			list[len(list)-1] = courseId
+		}
+	}
+
+	//2.3 创建从IngredientId到Ingredient的映射
+	var ingredientIdIngredientMap = make(map[string]*entity.Ingredient)
+	ingredientList, err := dao.IngredientDao.FindIngredientByIdList(idList)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, ingredient := range ingredientList {
+		ingredientIdIngredientMap[ingredient.Id] = ingredient
+	}
+
+	//3. 手动重新组建page，减少数据库压力
+	conveyModelToVo := func(model *entity.Ingredient) *vo.IngredientVO {
+		return &vo.IngredientVO{
+			Id:          model.Id,
+			Name:        model.Name,
+			Image:       model.Image,
+			Description: model.Description,
+		}
+	}
+
 	var pageVO *vo.PageVO[vo.SearchCourseVO]
 	pageVO = vo.ConveyPageToPageVO(page, searchCourseModelToVo)
+	for _, course := range pageVO.Data {
+		ingredientIdList := courseIdIngredientIdMap[course.Id]
+		course.Ingredients = make([]*vo.IngredientVO, len(ingredientIdList))
+
+		for i, id := range ingredientIdList {
+			course.Ingredients[i] = conveyModelToVo(ingredientIdIngredientMap[id])
+		}
+
+	}
 
 	return pageVO, nil
 }
@@ -51,6 +108,7 @@ func (*CourseServiceImpl) GetCourseByTag(tagId string, pageNum int, pageSize int
 	return result, nil
 }
 
+// GetCourseDetail 获取课程详情
 func (*CourseServiceImpl) GetCourseDetail(courseId string) (*vo.CourseDetailVO, error) {
 	course, err := dao.CourseDao.FindCourseById(courseId)
 	if err != nil {

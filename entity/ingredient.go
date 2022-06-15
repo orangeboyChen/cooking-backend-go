@@ -3,10 +3,10 @@ package entity
 import "cooking-backend-go/common"
 
 type Ingredient struct {
-	Id           string `gorm:"primaryKey;column:id;type:varchar(32)"`
-	Name         string `gorm:"column:name;type:varchar(32)"`
-	Image        string `gorm:"column:image;type:varchar(32)"`
-	Introduction string `gorm:"column:introduction;type:varchar(32)"`
+	Id          string `gorm:"primaryKey;column:id;type:varchar(32)"`
+	Name        string `gorm:"column:name;type:varchar(32)"`
+	Image       string `gorm:"column:image;type:varchar(32)"`
+	Description string `gorm:"column:description;type:varchar(32)"`
 }
 
 type IngredientCourse struct {

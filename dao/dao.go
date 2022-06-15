@@ -6,11 +6,15 @@ import (
 )
 
 var (
-	CourseDao     courseDao     = &impl.CourseDaoImpl{}
-	TagDao        tagDao        = &impl.TagDaoImpl{}
-	UserDao       userDao       = &impl.UserDaoImpl{}
-	CourseStepDao courseStepDao = &impl.CourseStepDaoImpl{}
-	CourseTagDao  courseTagDao  = &impl.CourseTagDaoImpl{}
+	CourseDao           courseDao           = &impl.CourseDaoImpl{}
+	TagDao              tagDao              = &impl.TagDaoImpl{}
+	UserDao             userDao             = &impl.UserDaoImpl{}
+	CourseStepDao       courseStepDao       = &impl.CourseStepDaoImpl{}
+	CourseTagDao        courseTagDao        = &impl.CourseTagDaoImpl{}
+	IngredientDao       ingredientDao       = &impl.IngredientDaoImpl{}
+	IngredientCourseDao ingredientCourseDao = &impl.IngredientCourseDaoImpl{}
+	MealDao             mealDao             = &impl.MealDaoImpl{}
+	MealCourseDao       mealCourseDao       = &impl.MealCourseDao{}
 )
 
 type courseDao interface {
@@ -48,4 +52,21 @@ type userDao interface {
 type courseTagDao interface {
 	InsertCourseTagList(list []*entity.CourseTag) error
 	DeleteCourseTagByCourseId(courseId string) error
+}
+
+type ingredientDao interface {
+	InsertIngredient(ingredient *entity.Ingredient) error
+	FindIngredientByIdList(idList []string) ([]*entity.Ingredient, error)
+}
+
+type ingredientCourseDao interface {
+	FindIngredientCourseByCourseId(courseId string) ([]*entity.IngredientCourse, error)
+	FindIngredientCourseByCourseIdList(courseIdList []string) ([]*entity.IngredientCourse, error)
+}
+
+type mealDao interface {
+	InsertMeal(meal *entity.Meal) error
+}
+
+type mealCourseDao interface {
 }
